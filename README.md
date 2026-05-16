@@ -4,7 +4,7 @@ Yapay zeka destekli akıllı hava durumu asistanı. Python backend + HTML/CSS/JS
 
 ## 📸 Önizleme
 
-Canlı demo: [Render'daki URL buraya gelecek]
+Canlı demo: [https://weatherforecastagent.onrender.com/](https://weatherforecastagent.onrender.com/)
 
 ## ✨ Özellikler
 
@@ -18,23 +18,26 @@ Canlı demo: [Render'daki URL buraya gelecek]
 ## 🛠️ Teknolojiler
 
 **Backend:**
+
 - Python 3.x
 - Flask (Web Framework)
 - Requests (HTTP istekleri)
 - python-dotenv (Environment variables)
 
 **Frontend:**
+
 - HTML5
 - CSS3 (Animations, Flexbox, Grid)
 - Vanilla JavaScript (ES6+)
 
 **API:**
+
 - OpenWeatherMap API
 
 ## 📋 Gereksinimler
 
 - Python 3.7 veya üzeri
-- OpenWeatherMap API Key ([buradan ücretsiz alın](https://openweathermap.org/api))
+- OpenWeatherMap API Key: [https://openweathermap.org/api](https://openweathermap.org/api)
 
 ## 🚀 Kurulum
 
@@ -98,6 +101,7 @@ git push -u origin main
 ### 3. Environment Variables Ekleyin
 
 Render Dashboard'da:
+
 - "Environment" sekmesine gidin
 - "Add Environment Variable" tıklayın
 - Key: `OPENWEATHER_API_KEY`
@@ -112,15 +116,15 @@ Render otomatik olarak build edip deploy edecektir. Birkaç dakika içinde uygul
 
 ```
 hava-durumu-agent/
-├── backend/
-│   ├── app.py              # Flask API
-│   ├── agent.py            # Hava Durumu Agent sınıfı
-│   ├── requirements.txt    # Python bağımlılıkları
-│   └── .env               # Environment variables (git'e eklenmez)
 ├── frontend/
 │   ├── index.html         # Ana HTML
 │   ├── style.css          # CSS styling
 │   └── script.js          # JavaScript logic
+│
+├── app.py              # Flask API
+├── agent.py            # Hava Durumu Agent sınıfı
+├── requirements.txt    # Python bağımlılıkları
+├── .env                # Environment variables (git'e eklenmez)
 ├── .gitignore
 └── README.md
 ```
@@ -168,12 +172,15 @@ curl -X POST http://localhost:5000/api/hava-durumu \
 ## 📝 API Endpoints
 
 ### `GET /`
+
 Ana sayfa (HTML)
 
 ### `POST /api/hava-durumu`
+
 Hava durumu sorgulama
 
 **Request:**
+
 ```json
 {
   "sehir": "Istanbul"
@@ -181,6 +188,7 @@ Hava durumu sorgulama
 ```
 
 **Response:**
+
 ```json
 {
   "sehir": "Istanbul",
@@ -200,19 +208,23 @@ Hava durumu sorgulama
 ```
 
 ### `GET /api/health`
+
 Health check endpoint
 
 ## 🐛 Sorun Giderme
 
 **"API key tanımlanmamış" hatası:**
+
 - `.env` dosyasında `OPENWEATHER_API_KEY` değişkenini kontrol edin
 - API key'in aktif olduğundan emin olun (10-15 dakika sürebilir)
 
 **"Şehir bulunamadı" hatası:**
+
 - Şehir ismini İngilizce veya Türkçe karakterler olmadan yazın
 - Örnek: "Izmir" yerine "Izmir" veya "İzmir"
 
 **Port zaten kullanımda:**
+
 - `.env` dosyasında `PORT` değerini değiştirin
 - Veya çalışan diğer uygulamaları kapatın
 
@@ -232,7 +244,7 @@ Sorularınız için Medium yazısının yorum kısmını kullanabilirsiniz!
 
 ---
 
-**Medium Yazısı:** [MCP ve Agent'ları Sıfırdan Öğrenin](#)
+**Medium Yazısı:** [MCP ve Agent&#39;ları Sıfırdan Öğrenin](#)
 
 **Live Demo:** [Buraya deploy linki gelecek](#)
 
