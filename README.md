@@ -246,6 +246,6 @@ Sorularınız için Medium yazısının yorum kısmını kullanabilirsiniz!
 
 **Medium Yazısı:** [MCP ve Agent&#39;ları Sıfırdan Öğrenin](#)
 
-**Live Demo:** [Buraya deploy linki gelecek](#)
+**Live Demo:** [https://weatherforecastagent.onrender.com/](https://weatherforecastagent.onrender.com/)
 
 🚀 Başarılar!
