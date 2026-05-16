@@ -55,10 +55,15 @@ def hava_durumu():
 
 @app.route('/api/health', methods=['GET'])
 def health():
-    """Health check endpoint"""
+    if not API_KEY:
+        return jsonify({
+            "status": "unhealthy",
+            "service": "weather-forecast-agent"
+        }), 500
+
     return jsonify({
-        "status": "ok",
-        "api_key_configured": bool(API_KEY)
+        "status": "healthy",
+        "service": "weather-forecast-agent"
     }), 200
 
 if __name__ == '__main__':
