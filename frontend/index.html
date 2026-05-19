@@ -3,64 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🤖 Hava Durumu Agent</title>
+    <title>🤖 Weather Agent</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Yağmur animasyonu için container -->
     <div id="rain-container"></div>
 
     <div class="container">
-        <!-- Header -->
         <header class="header">
-            <h1 class="title">🤖 Hava Durumu Agent</h1>
-            <p class="subtitle">Yapay zeka destekli akıllı hava durumu asistanınız</p>
+            <div class="header-top">
+                <div class="header-spacer"></div>
+                <h1 class="title">🤖 <span id="app-title">Hava Durumu Agent</span></h1>
+                <button id="lang-toggle" class="btn-lang" onclick="toggleLanguage()">🌍 EN</button>
+            </div>
+            <p class="subtitle" id="app-subtitle">Yapay zeka destekli akıllı hava durumu asistanınız</p>
         </header>
 
-        <!-- Şehir Seçimi -->
         <section class="search-section">
-            <h2 class="section-title">📍 Şehir Seçin</h2>
-            
+            <h2 class="section-title" id="section-title">📍 Şehir Seçin</h2>
+
             <div class="search-box">
-                <input 
-                    type="text" 
-                    id="city-input" 
+                <input
+                    type="text"
+                    id="city-input"
                     placeholder="Şehir adı girin..."
                     value="Istanbul"
                 >
                 <button id="search-btn" class="btn btn-primary">
-                    🔍 Kontrol Et
+                    🔍 <span id="search-btn-text">Kontrol Et</span>
                 </button>
             </div>
 
-            <!-- Popüler şehirler -->
             <div class="popular-cities" id="popular-cities">
-                <button class="city-tag">Istanbul</button>
-                <button class="city-tag">Ankara</button>
-                <button class="city-tag">Izmir</button>
-                <button class="city-tag">Bursa</button>
-                <button class="city-tag">Antalya</button>
-                <button class="city-tag">Adana</button>
-                <button class="city-tag">Konya</button>
-                <button class="city-tag">Gaziantep</button>
+                <!-- Filled by JS -->
             </div>
         </section>
 
-        <!-- Loading Spinner -->
         <div id="loading" class="loading hidden">
             <div class="spinner"></div>
-            <p>Hava durumu kontrol ediliyor...</p>
+            <p id="loading-text">Hava durumu kontrol ediliyor...</p>
         </div>
 
-        <!-- Hata Mesajı -->
         <div id="error-box" class="error-box hidden">
             <span class="error-icon">⚠️</span>
             <p id="error-message"></p>
         </div>
 
-        <!-- Hava Durumu Sonuçları -->
         <div id="weather-result" class="weather-result hidden">
-            <!-- Ana Kart -->
             <div class="weather-card">
                 <div class="weather-header">
                     <div class="location-info">
@@ -76,39 +65,39 @@
                     <span id="temp-value">—</span>°C
                 </div>
 
-                <!-- Detaylar Grid -->
                 <div class="details-grid">
                     <div class="detail-card">
-                        <div class="detail-label">💧 Nem</div>
+                        <div class="detail-label" id="label-humidity">💧 Nem</div>
                         <div class="detail-value" id="humidity">—%</div>
                     </div>
                     <div class="detail-card">
-                        <div class="detail-label">💨 Rüzgar</div>
+                        <div class="detail-label" id="label-wind">💨 Rüzgar</div>
                         <div class="detail-value" id="wind">— m/s</div>
                     </div>
                     <div class="detail-card">
-                        <div class="detail-label">🌡️ Hissedilen</div>
+                        <div class="detail-label" id="label-feels-like">🌡️ Hissedilen</div>
                         <div class="detail-value" id="feels-like">—°C</div>
                     </div>
                     <div class="detail-card">
-                        <div class="detail-label">📊 Basınç</div>
+                        <div class="detail-label" id="label-pressure">📊 Basınç</div>
                         <div class="detail-value" id="pressure">— hPa</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Agent Önerileri -->
-            <div class="recommendation-card" id="recommendation">
-                <h3 class="recommendation-title">🤖 Agent Önerileri</h3>
+            <div class="recommendation-card">
+                <div class="recommendation-header">
+                    <h3 class="recommendation-title" id="rec-title">🤖 Agent Önerileri</h3>
+                    <span class="rec-source hidden" id="rec-source"></span>
+                </div>
                 <div class="recommendation-content" id="recommendation-content">
                     <p id="recommendation-text">—</p>
                 </div>
             </div>
         </div>
 
-        <!-- Footer -->
         <footer class="footer">
-            <p>Powered by OpenWeatherMap API • Medium Yazısından Öğrendiniz 🚀</p>
+            <p id="footer-text">Powered by OpenWeatherMap API &amp; Claude AI 🚀</p>
         </footer>
     </div>
 

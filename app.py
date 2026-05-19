@@ -5,18 +5,13 @@ from agent import HavaDurumuAgent
 import os
 from dotenv import load_dotenv
 
-# .env dosyasını yükle
 load_dotenv()
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-FRONTEND_DIR = os.path.join(BASE_DIR, "frontend")
-
 app = Flask(__name__, static_folder='frontend', static_url_path='')
-CORS(app)  # CORS'u etkinleştir
-
-# API key'i environment variable'dan al
+CORS(app)
 
 API_KEY = os.getenv('OPENWEATHER_API_KEY')
+ANTHROPIC_KEY = os.getenv('ANTHROPIC_API_KEY')
 
 if not API_KEY:
     print("⚠️  UYARI: OPENWEATHER_API_KEY bulunamadı! .env dosyasını kontrol edin.")
@@ -32,14 +27,14 @@ def hava_durumu():
     try:
         data = request.get_json()
         sehir = data.get('sehir', 'Istanbul')
-        
+        lang = data.get('lang', 'tr')
+
         if not API_KEY:
             return jsonify({
                 "error": "API key tanımlanmamış. Lütfen .env dosyasını kontrol edin."
             }), 500
-        
-        # Agent'ı oluştur ve çalıştır
-        agent = HavaDurumuAgent(sehir, API_KEY)
+
+        agent = HavaDurumuAgent(sehir, API_KEY, lang=lang, anthropic_key=ANTHROPIC_KEY)
         sonuc = agent.calistir()
         
         # Hata kontrolü

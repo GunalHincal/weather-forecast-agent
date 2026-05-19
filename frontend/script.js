@@ -1,81 +1,147 @@
-// DOM Elements
-const cityInput = document.getElementById('city-input');
-const searchBtn = document.getElementById('search-btn');
-const popularCities = document.querySelectorAll('.city-tag');
-const loading = document.getElementById('loading');
-const errorBox = document.getElementById('error-box');
-const errorMessage = document.getElementById('error-message');
-const weatherResult = document.getElementById('weather-result');
-const rainContainer = document.getElementById('rain-container');
+// ── Language state ────────────────────────────────────────────────────────────
+let currentLang = 'tr';
 
-// Weather data elements
-const cityName = document.getElementById('city-name');
-const weatherDescription = document.getElementById('weather-description');
-const weatherIcon = document.getElementById('weather-icon');
-const tempValue = document.getElementById('temp-value');
-const humidity = document.getElementById('humidity');
-const wind = document.getElementById('wind');
-const feelsLike = document.getElementById('feels-like');
-const pressure = document.getElementById('pressure');
+const TRANSLATIONS = {
+    tr: {
+        appTitle:        'Hava Durumu Agent',
+        subtitle:        'Yapay zeka destekli akıllı hava durumu asistanınız',
+        sectionTitle:    '📍 Şehir Seçin',
+        placeholder:     'Şehir adı girin...',
+        searchBtn:       'Kontrol Et',
+        loading:         'Hava durumu kontrol ediliyor...',
+        loadingBtn:      'Yükleniyor...',
+        recTitle:        '🤖 Agent Önerileri',
+        labelHumidity:   '💧 Nem',
+        labelWind:       '💨 Rüzgar',
+        labelFeelsLike:  '🌡️ Hissedilen',
+        labelPressure:   '📊 Basınç',
+        langBtn:         '🌍 EN',
+        srcLLM:          '✨ Yapay zeka',
+        srcRule:         '📋 Kural tabanlı',
+        footer:          'Powered by OpenWeatherMap API & Claude AI 🚀',
+        cities:          ['Istanbul', 'Ankara', 'Izmir', 'Bursa', 'Antalya', 'Adana', 'Trabzon', 'Konya'],
+        defaultCity:     'Istanbul',
+    },
+    en: {
+        appTitle:        'Weather Agent',
+        subtitle:        'Your AI-powered smart weather assistant',
+        sectionTitle:    '📍 Choose a City',
+        placeholder:     'Enter city name...',
+        searchBtn:       'Check',
+        loading:         'Checking weather conditions...',
+        loadingBtn:      'Loading...',
+        recTitle:        '🤖 Agent Recommendations',
+        labelHumidity:   '💧 Humidity',
+        labelWind:       '💨 Wind',
+        labelFeelsLike:  '🌡️ Feels Like',
+        labelPressure:   '📊 Pressure',
+        langBtn:         '🇹🇷 TR',
+        srcLLM:          '✨ AI powered',
+        srcRule:         '📋 Rule based',
+        footer:          'Powered by OpenWeatherMap API & Claude AI 🚀',
+        cities:          ['London', 'Paris', 'New York', 'Tokyo', 'Dubai', 'Sydney', 'Berlin', 'Barcelona'],
+        defaultCity:     'London',
+    },
+};
+
+function toggleLanguage() {
+    currentLang = currentLang === 'tr' ? 'en' : 'tr';
+    applyLanguage();
+}
+
+function applyLanguage() {
+    const L = TRANSLATIONS[currentLang];
+    document.documentElement.lang = currentLang;
+    document.getElementById('app-title').textContent        = L.appTitle;
+    document.getElementById('app-subtitle').textContent     = L.subtitle;
+    document.getElementById('section-title').textContent    = L.sectionTitle;
+    document.getElementById('city-input').placeholder       = L.placeholder;
+    document.getElementById('search-btn-text').textContent  = L.searchBtn;
+    document.getElementById('loading-text').textContent     = L.loading;
+    document.getElementById('rec-title').textContent        = L.recTitle;
+    document.getElementById('label-humidity').textContent   = L.labelHumidity;
+    document.getElementById('label-wind').textContent       = L.labelWind;
+    document.getElementById('label-feels-like').textContent = L.labelFeelsLike;
+    document.getElementById('label-pressure').textContent   = L.labelPressure;
+    document.getElementById('lang-toggle').textContent      = L.langBtn;
+    document.getElementById('footer-text').textContent      = L.footer;
+    renderCities(L.cities);
+}
+
+function renderCities(cities) {
+    const container = document.getElementById('popular-cities');
+    container.innerHTML = '';
+    cities.forEach(city => {
+        const btn = document.createElement('button');
+        btn.className = 'city-tag';
+        btn.textContent = city;
+        btn.addEventListener('click', () => {
+            document.getElementById('city-input').value = city;
+            fetchWeather(city);
+        });
+        container.appendChild(btn);
+    });
+}
+
+// ── DOM refs ──────────────────────────────────────────────────────────────────
+const cityInput            = document.getElementById('city-input');
+const searchBtn            = document.getElementById('search-btn');
+const loading              = document.getElementById('loading');
+const errorBox             = document.getElementById('error-box');
+const errorMessage         = document.getElementById('error-message');
+const weatherResult        = document.getElementById('weather-result');
+const rainContainer        = document.getElementById('rain-container');
+const cityName             = document.getElementById('city-name');
+const weatherDescription   = document.getElementById('weather-description');
+const weatherIcon          = document.getElementById('weather-icon');
+const tempValue            = document.getElementById('temp-value');
+const humidity             = document.getElementById('humidity');
+const wind                 = document.getElementById('wind');
+const feelsLike            = document.getElementById('feels-like');
+const pressure             = document.getElementById('pressure');
 const recommendationContent = document.getElementById('recommendation-content');
-const recommendationText = document.getElementById('recommendation-text');
+const recommendationText   = document.getElementById('recommendation-text');
 
-// API endpoint (production'da boş string, development'ta localhost)
-const API_URL = window.location.hostname === 'localhost' 
+const API_URL = window.location.hostname === 'localhost'
     ? 'http://localhost:5000'
     : '';
 
-// Event Listeners
+// ── Events ────────────────────────────────────────────────────────────────────
 searchBtn.addEventListener('click', () => {
     const city = cityInput.value.trim();
-    if (city) {
-        fetchWeather(city);
-    }
+    if (city) fetchWeather(city);
 });
 
-cityInput.addEventListener('keypress', (e) => {
+cityInput.addEventListener('keypress', e => {
     if (e.key === 'Enter') {
         const city = cityInput.value.trim();
-        if (city) {
-            fetchWeather(city);
-        }
+        if (city) fetchWeather(city);
     }
 });
 
-popularCities.forEach(cityTag => {
-    cityTag.addEventListener('click', () => {
-        const city = cityTag.textContent;
-        cityInput.value = city;
-        fetchWeather(city);
-    });
-});
-
-// Hava durumu verisi çekme
+// ── Fetch ─────────────────────────────────────────────────────────────────────
 async function fetchWeather(city) {
-    // UI'ı hazırla
     showLoading();
     hideError();
     hideWeatherResult();
-    stopRainAnimation();
+    clearAnimations();
 
     try {
         const response = await fetch(`${API_URL}/api/hava-durumu`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ sehir: city })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sehir: city, lang: currentLang }),
         });
 
         const data = await response.json();
 
         if (!response.ok) {
-            throw new Error(data.error || 'Hava durumu bilgisi alınamadı!');
+            throw new Error(data.error || (currentLang === 'tr'
+                ? 'Hava durumu bilgisi alınamadı!'
+                : 'Could not fetch weather data!'));
         }
 
-        // Başarılı - verileri göster
         displayWeather(data);
-        
     } catch (error) {
         showError(error.message);
     } finally {
@@ -83,108 +149,118 @@ async function fetchWeather(city) {
     }
 }
 
-// Hava durumu verisini göster
+// ── Display ───────────────────────────────────────────────────────────────────
 function displayWeather(data) {
-    // Şehir bilgileri
-    cityName.textContent = `${data.sehir}, ${data.ulke}`;
+    cityName.textContent          = `${data.sehir}, ${data.ulke}`;
     weatherDescription.textContent = data.durum;
-    
-    // Hava durumu ikonu
-    weatherIcon.src = `https://openweathermap.org/img/wn/${data.icon}@2x.png`;
-    weatherIcon.alt = data.durum;
-    
-    // Sıcaklık ve detaylar
-    tempValue.textContent = data.sicaklik;
-    humidity.textContent = `${data.nem}%`;
-    wind.textContent = `${data.ruzgar} m/s`;
-    feelsLike.textContent = `${data.hissedilen}°C`;
-    pressure.textContent = `${data.basinc} hPa`;
-    
-    // Agent önerisi
+    weatherIcon.src               = `https://openweathermap.org/img/wn/${data.icon}@2x.png`;
+    weatherIcon.alt               = data.durum;
+    tempValue.textContent         = data.sicaklik;
+    humidity.textContent          = `${data.nem}%`;
+    wind.textContent              = `${data.ruzgar} m/s`;
+    feelsLike.textContent         = `${data.hissedilen}°C`;
+    pressure.textContent          = `${data.basinc} hPa`;
     recommendationText.textContent = data.oneri;
     recommendationContent.className = `recommendation-content ${data.oneri_tipi}`;
-    
-    // Arka plan rengini güncelle
-    updateBackground(data.oneri_tipi);
-    
-    // Yağmur animasyonu
-    if (data.yagmur_var) {
-        startRainAnimation();
+
+    const recSource = document.getElementById('rec-source');
+    const L = TRANSLATIONS[currentLang];
+    if (data.oneri_kaynagi === 'llm') {
+        recSource.textContent = L.srcLLM;
+        recSource.className   = 'rec-source rec-llm';
+    } else {
+        recSource.textContent = L.srcRule;
+        recSource.className   = 'rec-source rec-rule';
     }
-    
-    // Sonuç kartını göster
+    recSource.classList.remove('hidden');
+
+    updateBackground(data.oneri_tipi);
+
+    const type = data.oneri_tipi;
+    if (type === 'rain' || type === 'drizzle' || type === 'thunderstorm') {
+        startRain(type === 'thunderstorm' ? 80 : 50);
+    } else if (type === 'snow') {
+        startSnow();
+    }
+
     showWeatherResult();
 }
 
-// Arka plan rengini güncelle
+// ── Background gradient ───────────────────────────────────────────────────────
 function updateBackground(type) {
-    const body = document.body;
-    
     const gradients = {
-        rain: 'linear-gradient(135deg, #4a5568 0%, #2d3748 100%)',
-        hot: 'linear-gradient(135deg, #f6ad55 0%, #ed8936 100%)',
-        cold: 'linear-gradient(135deg, #90cdf4 0%, #4299e1 100%)',
-        good: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+        thunderstorm: 'linear-gradient(135deg, #2d1b69 0%, #1a0a3d 100%)',
+        drizzle:      'linear-gradient(135deg, #5c7a9e 0%, #3d5a7a 100%)',
+        rain:         'linear-gradient(135deg, #4a5568 0%, #2d3748 100%)',
+        snow:         'linear-gradient(135deg, #bee3f8 0%, #90cdf4 100%)',
+        fog:          'linear-gradient(135deg, #718096 0%, #4a5568 100%)',
+        hot:          'linear-gradient(135deg, #f6ad55 0%, #ed8936 100%)',
+        cold:         'linear-gradient(135deg, #90cdf4 0%, #4299e1 100%)',
+        cool:         'linear-gradient(135deg, #76e4f7 0%, #4299e1 100%)',
+        good:         'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
     };
-    
-    body.style.background = gradients[type] || gradients.good;
+    document.body.style.background = gradients[type] || gradients.good;
 }
 
-// Yağmur animasyonu başlat
-function startRainAnimation() {
+// ── Animations ────────────────────────────────────────────────────────────────
+function startRain(count = 50) {
     rainContainer.innerHTML = '';
-    
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < count; i++) {
         const drop = document.createElement('div');
         drop.className = 'rain-drop';
-        drop.style.left = `${Math.random() * 100}%`;
-        drop.style.animationDelay = `${Math.random() * 2}s`;
+        drop.style.left              = `${Math.random() * 100}%`;
+        drop.style.animationDelay    = `${Math.random() * 2}s`;
         drop.style.animationDuration = `${0.5 + Math.random()}s`;
         rainContainer.appendChild(drop);
     }
 }
 
-// Yağmur animasyonu durdur
-function stopRainAnimation() {
+function startSnow() {
+    rainContainer.innerHTML = '';
+    const flakes = ['❄', '❅', '❆'];
+    for (let i = 0; i < 50; i++) {
+        const flake = document.createElement('div');
+        flake.className = 'snow-flake';
+        flake.textContent            = flakes[Math.floor(Math.random() * flakes.length)];
+        flake.style.left             = `${Math.random() * 100}%`;
+        flake.style.fontSize         = `${0.8 + Math.random() * 1.4}rem`;
+        flake.style.opacity          = `${0.5 + Math.random() * 0.5}`;
+        flake.style.animationDelay   = `${Math.random() * 6}s`;
+        flake.style.animationDuration = `${4 + Math.random() * 6}s`;
+        rainContainer.appendChild(flake);
+    }
+}
+
+function clearAnimations() {
     rainContainer.innerHTML = '';
 }
 
-// Loading göster
+// ── UI helpers ────────────────────────────────────────────────────────────────
 function showLoading() {
     loading.classList.remove('hidden');
     searchBtn.disabled = true;
-    searchBtn.textContent = 'Yükleniyor...';
+    document.getElementById('search-btn-text').textContent =
+        TRANSLATIONS[currentLang].loadingBtn;
 }
 
-// Loading gizle
 function hideLoading() {
     loading.classList.add('hidden');
     searchBtn.disabled = false;
-    searchBtn.textContent = '🔍 Kontrol Et';
+    document.getElementById('search-btn-text').textContent =
+        TRANSLATIONS[currentLang].searchBtn;
 }
 
-// Hata göster
 function showError(message) {
     errorMessage.textContent = message;
     errorBox.classList.remove('hidden');
 }
 
-// Hata gizle
-function hideError() {
-    errorBox.classList.add('hidden');
-}
+function hideError()        { errorBox.classList.add('hidden'); }
+function showWeatherResult() { weatherResult.classList.remove('hidden'); }
+function hideWeatherResult() { weatherResult.classList.add('hidden'); }
 
-// Hava durumu sonucunu göster
-function showWeatherResult() {
-    weatherResult.classList.remove('hidden');
-}
-
-// Hava durumu sonucunu gizle
-function hideWeatherResult() {
-    weatherResult.classList.add('hidden');
-}
-
-// Sayfa yüklendiğinde varsayılan şehir için veri çek
+// ── Init ──────────────────────────────────────────────────────────────────────
 window.addEventListener('load', () => {
-    fetchWeather('Istanbul');
+    applyLanguage();
+    fetchWeather(TRANSLATIONS[currentLang].defaultCity);
 });
